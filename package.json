@@ -3,8 +3,8 @@
   "main": "gateway.js",
   "scripts": {
     "start-gateway": "nodemon gateway.js",
-    "start-service-kitchens": "nodemon services/products/index.js",
-    "start-service-users": "nodemon services/inventory/index.js",
+    "start-service-kitchens": "nodemon services/kitchens/index.js",
+    "start-service-users": "nodemon services/users/index.js",
     "start-services": "concurrently \"npm:start-service-*\"",
     "postinstall": "lerna bootstrap"
   },
