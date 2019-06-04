@@ -2,11 +2,17 @@ const { ApolloServer, gql } = require('apollo-server');
 const { buildFederatedSchema } = require('@apollo/federation');
 
 const typeDefs = gql`
-  type Query {
-    kitchen: Kitchen
+  extend type Query {
+    kitchen(id: ID!): Kitchen
   }
 
   type Kitchen @key(fields: "id") {
+    id: ID!
+    name: String
+    food: [Food]
+  }
+
+  type Food {
     id: ID!
     name: String!
   }
@@ -17,7 +23,16 @@ const server = new ApolloServer({
     {
       typeDefs,
       resolvers: {
-        Query: {},
+        Query: {
+          kitchen: args => {
+            return kitchens[args.id];
+          },
+        },
+        Kitchen: {
+          __resolveReference: kitchen => {
+            return kitchens[kitchen.id];
+          },
+        },
       },
     },
   ]),
@@ -27,17 +42,15 @@ server.listen({ port: 4001 }).then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
 });
 
-const users = [
+const kitchens = [
   {
     id: '1',
-    name: 'Ada Lovelace',
-    birthDate: '1815-12-10',
-    username: '@ada',
+    name: 'Kitchen 1',
+    food: [{ id: '1', name: 'Cereal' }],
   },
   {
     id: '2',
-    name: 'Alan Turing',
-    birthDate: '1912-06-23',
-    username: '@complete',
+    name: 'Kitchen 2',
+    food: [{ id: '2', name: 'Apple' }],
   },
 ];
