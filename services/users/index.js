@@ -6,16 +6,24 @@ const typeDefs = gql`
     me: User
   }
 
+  extend type Mutation {
+    echo(input: String!): EchoResponse!
+  }
+
   extend type Kitchen @key(fields: "id") {
     id: ID! @external
-    name: String @external
   }
 
   type User @key(fields: "username") {
     username: ID!
     firstName: String!
-    kitchen: Kitchen @provides(fields: "name")
+    kitchen: Kitchen
     lastName: String!
+  }
+
+  type EchoResponse {
+    message: String!
+    query: Query
   }
 `;
 
@@ -35,9 +43,14 @@ const server = new ApolloServer({
             };
           },
         },
+        Mutation: {
+          echo: (_, args) => {
+            return { message: args.input, query: { __typename: 'Query' } };
+          },
+        },
         User: {
           kitchen: user => {
-            return { id: user.kitchenId, name: user.kitchenName };
+            return { id: user.kitchenId };
           },
         },
       },
